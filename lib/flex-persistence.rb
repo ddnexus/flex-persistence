@@ -1,0 +1,6 @@
+require 'active_attr'
+require 'flex/persistence/storage'
+require 'flex/persistence/finders'
+require 'flex/class_proxy/stored_model'
+require 'flex/instance_proxy/stored_model'
+require 'flex/stored_model'
