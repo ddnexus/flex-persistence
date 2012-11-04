@@ -4,9 +4,9 @@ module Flex
 
       include Modules::Loader
       include Modules::Model
+      include Modules::Scope
 
       alias_method :full_sync, :sync
-
       def sync(*synced)
         raise ArgumentError, 'You cannot flex.sync(self) a Flex::StoredModel.' \
               if synced.any?{|s| s == host_class}
@@ -56,12 +56,6 @@ module Flex
         object.id       = result['_id']
         object._version = result['_version']
         object
-      end
-
-      def define_search(name, source, source_vars=nil)
-        structure = Array.wrap(Utils.data_from_source(source))
-        template  = Template::Search.new(*structure).setup(self, name.to_s, source_vars)
-        add_template(name.to_sym, template)
       end
 
     end

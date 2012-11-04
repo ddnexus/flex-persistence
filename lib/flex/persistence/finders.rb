@@ -32,10 +32,6 @@ module Flex
         flex.process_result(result).first
       end
 
-      def scope(*args)
-        flex.define_search *args
-      end
-
     end
   end
 end
