@@ -4,9 +4,9 @@ module Flex
 
       def find(id_or_ids)
         result = if id_or_ids.is_a?(Array)
-                   Flex.multi_get flex.metainfo(:ids => id_or_ids)
+                   Flex.multi_get metainfo(:ids => id_or_ids)
                  else
-                   Flex.get flex.metainfo(:id => id_or_ids)
+                   Flex.get metainfo(:id => id_or_ids)
                 end
         flex_result(result)
       end
@@ -30,6 +30,12 @@ module Flex
       def last
         result = Flex.match_all metainfo(:params => {:size => 1, :from => count-1})
         flex_result(result).first
+      end
+
+    private
+
+      def metainfo(vars={})
+        { :index => flex.index, :type => flex.type }.merge(vars)
       end
 
     end
