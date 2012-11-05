@@ -6,17 +6,18 @@ module Flex
 
     def self.included(base)
       base.class_eval do
+        @flex ||= ClassProxy::StoredModel.new(base)
+        def self.flex; @flex end
+        extend Persistence::Result
+
         include ActiveAttr::Model
 
         extend ActiveModel::Callbacks
         define_model_callbacks :save, :destroy
 
-        @flex ||= ClassProxy::StoredModel.new(base)
-        def self.flex; @flex end
-
-        extend Persistence::Find
-        extend Persistence::Storage::ClassMethods
         include Persistence::Storage::InstanceMethods
+        extend Persistence::Storage::ClassMethods
+        extend Persistence::Find
       end
     end
 
