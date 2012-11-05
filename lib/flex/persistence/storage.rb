@@ -20,7 +20,7 @@ module Flex
           return false unless valid?
           run_callbacks :save do
             result        = flex.store(vars)
-            self.id       = result['_id']
+            self._id      = result['_id']
             self._version = result['_version']
           end
           self
@@ -29,7 +29,7 @@ module Flex
         def reload
           document        = flex.get
           self.attributes = document['_source']
-          self.id         = document['_id']
+          self._id        = document['_id']
           self._version   = document['_version']
         end
 
@@ -57,7 +57,7 @@ module Flex
                 raise
               end
             end
-            self.id       = result['_id']
+            self._id      = result['_id']
             self._version = result['_version']
           end
           self

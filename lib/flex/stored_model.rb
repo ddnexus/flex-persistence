@@ -1,7 +1,8 @@
 module Flex
   module StoredModel
 
-    attr_accessor :_version, :id
+    attr_accessor :_version, :_id
+    alias_method :id, :_id
 
     def self.included(base)
       base.class_eval do
