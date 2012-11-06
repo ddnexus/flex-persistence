@@ -6,8 +6,10 @@ module Flex
         case result
         when Flex::Result::SourceDocument
           build_object result
-        when Flex::Result::SourceSearch
+        when Flex::Result::Search
           result['hits']['hits'].map {|d| build_object(d)}
+        when Flex::Result::MultiGet
+          result['docs'].map {|d| build_object(d)}
         else
           result
         end
