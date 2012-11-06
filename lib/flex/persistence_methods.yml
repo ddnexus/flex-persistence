@@ -1,0 +1,12 @@
+_missing_field:
+  missing:
+    field: <<missing>>
+
+find_by_terms:
+- query:
+    match_all: {}
+  filter:
+    and:
+      - term: <<terms>>
+      - <<_missing_field>>
+
