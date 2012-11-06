@@ -43,7 +43,7 @@ module Flex
       #    - terms will narrow the search and accepts :any_term => nil for missing values
       #    - vars are the standard rendering vars (you can pass parameters, etc.)
       #    - the results will be limited with the default :size param, if you need to retrieve all, pass a block
-      #    - if you pass a block, a scroll_search will be performed, and your block will be yielded many times
+      #    - if you pass a block, a scan_search will be performed, and your block will be yielded many times
       #      with an array of batched results. You can pass :scroll and :size as :params in order to control the action.
       #      See http://www.elasticsearch.org/guide/reference/api/search/scroll.html
       #
@@ -86,7 +86,7 @@ module Flex
         result = case terms
                  when nil
                    if block_given?
-                     flex.scroll_search(Flex.flex.templates[:match_all], metainfo(vars), &block)
+                     flex.scan_search(Flex.flex.templates[:match_all], metainfo(vars), &block)
                    else
                      Flex.match_all metainfo(vars)
                    end
@@ -96,7 +96,7 @@ module Flex
                    terms.each {|f, v| v.nil? ? missing_fields.push({ :missing => f }) : clean_terms[f] = v }
                    hash = metainfo(:terms => clean_terms, :_missing_field => missing_fields).merge(vars)
                    if block_given?
-                     flex.scroll_search(Persistence.flex.templates[:find_by_terms], hash, &block)
+                     flex.scan_search(Persistence.flex.templates[:find_by_terms], hash, &block)
                    else
                      Persistence.find_by_terms hash
                    end

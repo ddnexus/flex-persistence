@@ -22,7 +22,7 @@ module Flex
         include Persistence::Inspection
 
         class << self
-          delegate :scope, :scroll_search, :to => :flex
+          delegate :scope, :scan_search, :to => :flex
         end
       end
     end
