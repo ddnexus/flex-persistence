@@ -18,6 +18,9 @@ module Flex
         include Persistence::Storage::InstanceMethods
         extend Persistence::Storage::ClassMethods
         extend Persistence::Find
+        class << self
+          delegate :scope, :scroll_search, :to => :flex
+        end
       end
     end
 
