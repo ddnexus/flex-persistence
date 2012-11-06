@@ -1,4 +1,5 @@
 require 'active_attr'
+require 'flex/persistence/inspection'
 require 'flex/persistence/storage'
 require 'flex/persistence/result'
 require 'flex/persistence/finders'
