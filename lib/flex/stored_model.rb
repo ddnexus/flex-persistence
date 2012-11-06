@@ -8,7 +8,7 @@ module Flex
       base.class_eval do
         @flex ||= ClassProxy::StoredModel.new(base)
         def self.flex; @flex end
-        extend Persistence::Result
+        extend Persistence::FlexResult
         @flex.variables.add(:params => {:version => true})
 
         include ActiveAttr::Model

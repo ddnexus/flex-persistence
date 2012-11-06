@@ -1,6 +1,6 @@
 module Flex
   module Persistence
-    module Result
+    module FlexResult
 
       def flex_result(result)
         case result

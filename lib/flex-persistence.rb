@@ -1,7 +1,7 @@
 require 'active_attr'
 require 'flex/persistence/inspection'
 require 'flex/persistence/storage'
-require 'flex/persistence/result'
+require 'flex/persistence/flex_result'
 require 'flex/persistence/finders'
 require 'flex/class_proxy/stored_model'
 require 'flex/instance_proxy/stored_model'
