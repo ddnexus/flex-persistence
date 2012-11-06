@@ -22,7 +22,7 @@ module Flex
       end
 
       #    MyModel.first(terms=nil, vars={})
-      #    - terms will narrow the search and accepts nil for missing values
+      #    - terms will narrow the search and accepts :any_term => nil for missing values
       #    - vars are the standard rendering vars (you can pass parameters, etc.)
       #
       #    MyModel.first
@@ -40,7 +40,7 @@ module Flex
       end
 
       #    MyModel.all(terms=nil, vars={}, &block)
-      #    - terms will narrow the search and accepts nil for missing values
+      #    - terms will narrow the search and accepts :any_term => nil for missing values
       #    - vars are the standard rendering vars (you can pass parameters, etc.)
       #    - the results will be limited with the default :size param, if you need to retrieve all, pass a block
       #    - if you pass a block, a scroll_search will be performed, and your block will be yielded many times
