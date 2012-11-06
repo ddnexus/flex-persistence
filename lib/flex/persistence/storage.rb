@@ -16,21 +16,21 @@ module Flex
 
       module InstanceMethods
 
-        def save(vars={})
-          return false unless valid?
-          run_callbacks :save do
-            result        = flex.store(vars)
-            self._id      = result['_id']
-            self._version = result['_version']
-          end
-          self
-        end
-
         def reload
           document        = flex.get
           self.attributes = document['_source']
-          self._id        = document['_id']
-          self._version   = document['_version']
+          @_id            = document['_id']
+          @_version       = document['_version']
+        end
+
+        def save(vars={})
+          return false unless valid?
+          run_callbacks :save do
+            result    = flex.store(vars)
+            @_id      = result['_id']
+            @_version = result['_version']
+          end
+          self
         end
 
         # Optimistic Lock Update
@@ -39,8 +39,8 @@ module Flex
         #      d.amount += 100
         #    end
         #
-        # the block is potentially yielded many time, with a reloaded document
-        # but saved only if the document was not stale (i.e. the _version has not changed since it has been loaded)
+        # if you are trying to update a stale object, the block is yielded again with a fresh reloaded document and the
+        # document is saved only when it is not stale anymore (i.e. the _version has not changed since it has been loaded)
         # read: http://www.elasticsearch.org/blog/2011/02/08/versioning.html
         #
         def lock_update(vars={})
@@ -57,8 +57,8 @@ module Flex
                 raise
               end
             end
-            self._id      = result['_id']
-            self._version = result['_version']
+            @_id      = result['_id']
+            @_version = result['_version']
           end
           self
         end

@@ -18,9 +18,11 @@ module Flex
     private
 
       def build_object(result)
-        object          = new result['_source']
-        object._id      = result['_id']
-        object._version = result['_version']
+        object = new result['_source']
+        object.instance_eval do
+          @_id      = result['_id']
+          @_version = result['_version']
+        end
         object
       end
 
