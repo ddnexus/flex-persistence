@@ -18,11 +18,11 @@ module Flex
 
         include Persistence::Storage::InstanceMethods
         extend Persistence::Storage::ClassMethods
-        extend Persistence::Find
+        extend Persistence::Finders
         include Persistence::Inspection
 
         class << self
-          delegate :scope, :scan_search, :to => :flex
+          delegate :scan_search, :to => :flex
         end
       end
     end

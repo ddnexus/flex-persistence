@@ -1,6 +1,6 @@
 module Flex
   module Persistence
-    module Find
+    module Finders
 
 
       #    MyModel.find(ids)
@@ -74,6 +74,10 @@ module Flex
         else
           raise ArgumentError, "Unexpected argument (got #{terms.inspect})"
         end
+      end
+
+      def scope(*args)
+        flex.define_search(*args)
       end
 
       # 2 queries needed
