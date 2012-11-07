@@ -14,9 +14,9 @@ module Flex
       #
       def find(ids, vars={})
         result = if ids.is_a?(Array)
-                   Flex.multi_get(metainfo(:ids => ids).add(vars))
+                   Flex.multi_get(metainfo(:ids => ids).deep_merge(vars))
                  else
-                   Flex.get(metainfo(:id => ids).add(vars))
+                   Flex.get(metainfo(:id => ids).deep_merge(vars))
                  end
         flex_result(result)
       end
@@ -35,7 +35,7 @@ module Flex
       #      #=> #<MyModel ... color: "blue", size: "small">
       #
       def first(terms=nil, vars={})
-        vars = Variables.new(:params => {:size => 1}).add(vars)
+        vars = Variables.new(:params => {:size => 1}).deep_merge(vars)
         do_find(terms, vars).first
       end
 
@@ -64,10 +64,16 @@ module Flex
         do_find(terms, vars, &block)
       end
 
-      # needs a proper implementation with conditions
-      def count
-        result = Flex.count metainfo
-        result['count']
+      def count(terms=nil, vars={})
+        case terms
+        when nil
+          Flex.count(metainfo(vars))['count']
+        when Hash
+          hash = process_terms(terms, vars)
+          Persistence.flex.count_search(:find_by_terms, hash)['hits']['total']
+        else
+          raise ArgumentError, "Unexpected argument (got #{terms.inspect})"
+        end
       end
 
       # 2 queries needed
@@ -79,7 +85,7 @@ module Flex
     private
 
       def metainfo(vars={})
-        flex.variables.add(vars)
+        flex.variables.deep_merge(vars)
       end
 
       def do_find(terms, vars={}, &block)
@@ -91,10 +97,7 @@ module Flex
                      Flex.match_all metainfo(vars)
                    end
                  when Hash
-                   clean_terms    = {}
-                   missing_fields = []
-                   terms.each {|f, v| v.nil? ? missing_fields.push({ :missing => f }) : clean_terms[f] = v }
-                   hash = metainfo(:terms => clean_terms, :_missing_field => missing_fields).merge(vars)
+                   hash = process_terms(terms, vars)
                    if block_given?
                      flex.scan_search(Persistence.flex.templates[:find_by_terms], hash, &block)
                    else
@@ -106,6 +109,12 @@ module Flex
         flex_result(result)
       end
 
+      def process_terms(terms, vars)
+        clean_terms    = {}
+        missing_fields = []
+        terms.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (clean_terms[f] = v) }
+        metainfo(:terms => clean_terms, :_missing_fields => missing_fields).merge(vars)
+      end
 
     end
   end

@@ -1,4 +1,4 @@
-_missing_field:
+_missing_fields:
   missing:
     field: <<missing>>
 
@@ -8,5 +8,5 @@ find_by_terms:
   filter:
     and:
       - term: <<terms>>
-      - <<_missing_field>>
+      - <<_missing_fields>>
 
