@@ -22,7 +22,8 @@ module Flex
         include Persistence::Inspection
 
         class << self
-          delegate :scan_search, :to => :flex
+          delegate :define_search, :scan_search, :to => :flex
+          alias_method :scope, :define_search
         end
       end
     end

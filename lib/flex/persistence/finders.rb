@@ -76,10 +76,6 @@ module Flex
         end
       end
 
-      def scope(*args)
-        flex.define_search(*args)
-      end
-
       # 2 queries needed
       def last
         result = Flex.match_all metainfo(:params => {:size => 1, :from => count-1})
