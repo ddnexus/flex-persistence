@@ -26,6 +26,8 @@ module Flex
         def save(vars={})
           return false unless valid?
           run_callbacks :save do
+            self.created_at = DateTime.now if respond_to?(:created_at) && new_record?
+            self.updated_at = DateTime.now if respond_to?(:updated_at)
             result    = flex.store(vars)
             @_id      = result['_id']
             @_version = result['_version']
