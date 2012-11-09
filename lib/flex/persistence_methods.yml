@@ -2,11 +2,13 @@ _missing_fields:
   missing:
     field: <<missing>>
 
-find_by_terms:
+find:
 - query:
     match_all: {}
   filter:
     and:
-      - term: <<terms>>
-      - <<_missing_fields>>
+      - term: <<terms= ~ >>
+      - <<_missing_fields= ~ >>
+      - <<filters= ~ >>
+  sort: <<sort= ~ >>
 

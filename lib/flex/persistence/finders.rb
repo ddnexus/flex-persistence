@@ -14,106 +14,78 @@ module Flex
       #
       def find(ids, vars={})
         result = if ids.is_a?(Array)
-                   Flex.multi_get(metainfo(:ids => ids).deep_merge(vars))
+                   Flex.multi_get(process_vars(:ids => ids).deep_merge(vars))
                  else
-                   Flex.get(metainfo(:id => ids).deep_merge(vars))
+                   Flex.get(process_vars(:id => ids).deep_merge(vars))
                  end
         flex_result(result)
       end
 
-      #    MyModel.first(terms=nil, vars={})
-      #    - terms will narrow the search and accepts :any_term => nil for missing values
-      #    - vars are the standard rendering vars (you can pass parameters, etc.)
+      #    MyModel.all(vars={})
       #
-      #    MyModel.first
-      #      #=> #<MyModel ... color: nil, size: "small">
+      #    vars = { # accepts also :any_term => nil for missing values
+      #             :terms   => {:field_one => 'something', :field_two => nil},
+      #             # accepts one or an array of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
+      #             :sort    => {:field_three => :desc},
+      #             # accepts one or an array of filter structures
+      #             :filters => {:range => {:created_at => {:from => 2.days.ago, :to => Time.now}}}
       #
-      #    MyModel.first(:color => nil, :size => 'small')
-      #      #=> #<MyModel ... color: nil, size: "small">
+      #    # will retrieve all documents, the results will be limited by the default :size param
+      #    MyModel.all(vars_or_nil)
       #
-      #    MyModel.first(:color => 'blue', :size => 'small')
-      #      #=> #<MyModel ... color: "blue", size: "small">
-      #
-      def first(terms=nil, vars={})
-        vars = Variables.new(:params => {:size => 1}).deep_merge(vars)
-        do_find(terms, vars).first
+      def all(vars={})
+        variables = process_vars(vars)
+        result    = Persistence.find variables
+        flex_result(result)
       end
 
-      #    MyModel.all(terms=nil, vars={}, &block)
-      #    - terms will narrow the search and accepts :any_term => nil for missing values
-      #    - vars are the standard rendering vars (you can pass parameters, etc.)
-      #    - the results will be limited with the default :size param, if you need to retrieve all, pass a block
-      #    - if you pass a block, a scan_search will be performed, and your block will be yielded many times
-      #      with an array of batched results. You can pass :scroll and :size as :params in order to control the action.
+      #    MyModel.scan_all(vars={}, &block)
+      #    - vars are the same kind of Hash described for the method :all
+      #    - scan_search: the block will be yielded many times with an array of batched results.
+      #      You can pass :scroll and :size as :params in order to control the action.
       #      See http://www.elasticsearch.org/guide/reference/api/search/scroll.html
-      #
-      #    MyModel.all(terms_or_nil)
-      #      #=> [#<MyModel ... color: nil, size: "small">, #<MyModel ... color: "red", size: "small">, ... limited to :size]
-      #
-      #    MyModel.all(terms_or_nil) do |batch_of_results|
+      #    MyModel.all(vars_or_nil) do |batch_of_results|
       #      do_something_with batch_of_results
       #    end
       #
-      #    MyModel.all(:color => nil, :size => 'small')
-      #      #=> [#<MyModel ... color: nil, size: "small">, #<MyModel ... color: nil, size: "small">]
-      #
-      #    MyModel.all(:color => 'blue', :size => 'small')
-      #      #=> [#<MyModel ... color: "blue", size: "small">]
-      #
-      def all(terms=nil, vars={}, &block)
-        do_find(terms, vars, &block)
+      def scan_all(vars={}, &block)
+        variables = process_vars(vars)
+        result    = flex.scan_search(Persistence.flex.templates[:find], variables, &block)
+        flex_result(result)
       end
 
-      def count(terms=nil, vars={})
-        case terms
-        when nil
-          Flex.count(metainfo(vars))['count']
-        when Hash
-          hash = process_terms(terms, vars)
-          Persistence.flex.count_search(:find_by_terms, hash)['hits']['total']
-        else
-          raise ArgumentError, "Unexpected argument (got #{terms.inspect})"
-        end
+      #    MyModel.first(vars={})
+      #    - vars are the same kind of Hash described for the method :all
+      #    - it limits the size of the query to 1 and returns it as a single document object
+      #
+      def first(vars={})
+        vars = Variables.new(vars).deep_merge(:params => {:size => 1})
+        all(vars).first
       end
 
-      # 2 queries needed
-      def last
-        result = Flex.match_all metainfo(:params => {:size => 1, :from => count-1})
-        flex_result(result).first
+      #    MyModel.count(vars={})
+      #    - will return the count
+      #    - vars are the same kind of Hash described for the method :all
+      #
+      def count(vars={})
+        Persistence.flex.count_search(:find, process_vars(vars))['hits']['total']
       end
 
     private
 
-      def metainfo(vars={})
-        flex.variables.deep_merge(vars)
+      def process_vars(vars)
+        terms = process_terms(vars.delete(:terms))
+        flex.variables.deep_merge(vars, terms)
       end
 
-      def do_find(terms, vars={}, &block)
-        result = case terms
-                 when nil
-                   if block_given?
-                     flex.scan_search(Flex.flex.templates[:match_all], metainfo(vars), &block)
-                   else
-                     Flex.match_all metainfo(vars)
-                   end
-                 when Hash
-                   hash = process_terms(terms, vars)
-                   if block_given?
-                     flex.scan_search(Persistence.flex.templates[:find_by_terms], hash, &block)
-                   else
-                     Persistence.find_by_terms hash
-                   end
-                 else
-                   raise ArgumentError, "Unexpected argument (got #{terms.inspect})"
-                 end
-        flex_result(result)
-      end
-
-      def process_terms(terms, vars)
+      def process_terms(terms)
+        return unless terms
+        raise ArgumentError, "Unexpected argument (got #{terms.inspect})" \
+              unless terms.is_a?(Hash)
         clean_terms    = {}
         missing_fields = []
         terms.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (clean_terms[f] = v) }
-        metainfo(:terms => clean_terms, :_missing_fields => missing_fields).merge(vars)
+        {:terms => clean_terms, :_missing_fields => missing_fields}
       end
 
     end
