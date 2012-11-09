@@ -43,6 +43,7 @@ module Flex
 
     def update_attributes(attributes)
       attributes.each {|name, value| send "#{name}=", value }
+      save
     end
 
     module ClassMethods
