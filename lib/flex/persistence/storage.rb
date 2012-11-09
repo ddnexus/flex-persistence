@@ -78,11 +78,11 @@ module Flex
         end
 
         def persisted?
-          !!id && !!_version
+          !(new_record? || destroyed?)
         end
 
         def new_record?
-          !persisted?
+          !@_id || !@_version
         end
 
       end
