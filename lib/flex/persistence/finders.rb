@@ -18,7 +18,7 @@ module Flex
                  else
                    Flex.get(process_vars(:id => ids).deep_merge(vars))
                  end
-        flex_result(result)
+        flex_result(result, vars)
       end
 
       #    MyModel.all(vars={})
@@ -28,7 +28,9 @@ module Flex
       #             # accepts one or an array of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
       #             :sort    => {:field_three => :desc},
       #             # accepts one or an array of filter structures
-      #             :filters => {:range => {:created_at => {:from => 2.days.ago, :to => Time.now}}}
+      #             :filters => {:range => {:created_at => {:from => 2.days.ago, :to => Time.now}}
+      #             # other params passed to ES (in case of :fields the records will be frozen, and the missing fileds will be nil)
+      #             :params => {:fields => 'field_one,field_two,field_three'} }
       #
       #    # will retrieve all documents, the results will be limited by the default :size param
       #    MyModel.all(vars_or_nil)
@@ -36,7 +38,7 @@ module Flex
       def all(vars={})
         variables = process_vars(vars)
         result    = Persistence.find variables
-        flex_result(result)
+        flex_result(result, vars)
       end
 
       #    MyModel.scan_all(vars={}, &block)
@@ -51,7 +53,7 @@ module Flex
       def scan_all(vars={}, &block)
         variables = process_vars(vars)
         result    = flex.scan_search(Persistence.flex.templates[:find], variables, &block)
-        flex_result(result)
+        flex_result(result, vars)
       end
 
       #    MyModel.first(vars={})
@@ -68,7 +70,8 @@ module Flex
       #    - vars are the same kind of Hash described for the method :all
       #
       def count(vars={})
-        Persistence.flex.count_search(:find, process_vars(vars))['hits']['total']
+        result = Persistence.flex.count_search(:find, process_vars(vars))
+        result['hits']['total']
       end
 
     private

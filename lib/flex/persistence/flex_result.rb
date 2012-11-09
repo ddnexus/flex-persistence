@@ -2,14 +2,15 @@ module Flex
   module Persistence
     module FlexResult
 
-      def flex_result(result)
+      def flex_result(result, vars)
+        freeze = vars[:params] && !!vars[:params][:fields]
         case result
         when Flex::Result::SourceDocument
-          build_object result
+          build_object result, freeze
         when Flex::Result::Search
-          result['hits']['hits'].map {|d| build_object(d)}
+          result['hits']['hits'].map {|d| build_object(d, freeze)}
         when Flex::Result::MultiGet
-          result['docs'].map {|d| build_object(d)}
+          result['docs'].map {|d| build_object(d, freeze)}
         else
           result
         end
@@ -17,13 +18,13 @@ module Flex
 
     private
 
-      def build_object(result)
-        object = new result['_source']
+      def build_object(result, freeze)
+        object = new(freeze ? result['fields'] : result['_source'])
         object.instance_eval do
           @_id      = result['_id']
           @_version = result['_version']
         end
-        object
+        freeze ? object.freeze : object
       end
 
     end
