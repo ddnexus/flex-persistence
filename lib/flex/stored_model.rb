@@ -20,7 +20,7 @@ module Flex
         extend Persistence::Storage::ClassMethods
         extend Persistence::Finders
         include Persistence::Inspection
-        extend ClassMethods
+        extend Persistence::Timestamps
 
         class << self
           delegate :define_search, :scan_search, :to => :flex
@@ -44,15 +44,6 @@ module Flex
     def update_attributes(attributes)
       attributes.each {|name, value| send "#{name}=", value }
       save
-    end
-
-    module ClassMethods
-
-      def attribute_timestamps
-        attribute :created_at, :type => DateTime
-        attribute :updated_at, :type => DateTime
-      end
-
     end
 
   end
