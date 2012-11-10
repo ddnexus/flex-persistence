@@ -9,7 +9,7 @@ module Flex
 
       def attribute_created_at
         attribute :created_at, :type => DateTime
-        before_save { self.created_at = Time.now.utc if new_record? }
+        before_create { self.created_at = Time.now.utc }
       end
 
       def attribute_updated_at

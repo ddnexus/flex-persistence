@@ -25,9 +25,7 @@ module Flex
         def save(vars={})
           return false unless valid?
           run_callbacks :save do
-            result    = flex.store(vars)
-            @_id      = result['_id']
-            @_version = result['_version']
+            run_callbacks(new_record? ? :create : :update) { do_save(vars) }
           end
           self
         end
@@ -45,15 +43,17 @@ module Flex
         def lock_update(vars={})
           return false unless valid?
           run_callbacks :save do
-            begin
-              yield self
-              result = flex.store({:params => {:version => _version}}.merge(vars))
-            rescue Flex::HttpError => e
-              if e.status == 409
-                reload
-                retry
-              else
-                raise
+            run_callbacks :update do
+              begin
+                yield self
+                result = flex.store({:params => {:version => _version}}.merge(vars))
+              rescue Flex::HttpError => e
+                if e.status == 409
+                  reload
+                  retry
+                else
+                  raise
+                end
               end
             end
             @_id      = result['_id']
@@ -80,6 +80,14 @@ module Flex
 
         def new_record?
           !@_id || !@_version
+        end
+
+      private
+
+        def do_save(vars)
+          result    = flex.store(vars)
+          @_id      = result['_id']
+          @_version = result['_version']
         end
 
       end

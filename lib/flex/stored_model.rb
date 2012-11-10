@@ -14,7 +14,7 @@ module Flex
         include ActiveAttr::Model
 
         extend ActiveModel::Callbacks
-        define_model_callbacks :save, :destroy
+        define_model_callbacks :create, :update, :save, :destroy
 
         include Persistence::Storage::InstanceMethods
         extend Persistence::Storage::ClassMethods
