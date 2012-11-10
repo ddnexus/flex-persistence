@@ -74,6 +74,37 @@ module Flex
         result['hits']['total']
       end
 
+      # scoped methods. They returns a Scoped object similar to AR.
+      # You can chain scopes, then you can call :count, :first, :all and :scan_all to get your result
+      # This provides an alternative API to the variables hash. See Flex::Persistence::Scoped
+      #
+      #
+      #  scoped = MyModel.terms(:field_one => 'something', :field_two => nil)
+      #                  .sort(:field_three => :desc)
+      #                  .filters(:range => {:created_at => {:from => 2.days.ago, :to => Time.now})
+      #                  .fields('field_one,field_two,field_three')
+      #                  .params(:any => 'param')
+      #
+      #  # add another filter or other terms at any time
+      #  scoped2 = scoped.terms(...).filters(...)
+      #
+      #  scoped2.count
+      #  scoped2.first
+      #  scoped2.all
+      #  scoped2.scan_all {|res| do_something_with_results}
+
+
+      [:terms, :params, :filters, :sort, :fields].each do |meth|
+        define_method(meth) do |value|
+          Scoped.new(self).send(meth, value)
+        end
+      end
+
+      # You can start with a non restricted Flex::Persistence::Scoped object
+      def scoped
+        Scoped.new(self)
+      end
+
     private
 
       def process_vars(vars)

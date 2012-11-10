@@ -1,4 +1,5 @@
 require 'active_attr'
+require 'flex/persistence/scoped'
 require 'flex/persistence/timestamps'
 require 'flex/persistence/inspection'
 require 'flex/persistence/storage'
