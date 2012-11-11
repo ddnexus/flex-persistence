@@ -24,7 +24,7 @@ module Flex
 
       #    scoped methods. They returns a Scoped object similar to AR.
       #    You can chain scopes, then you can call :count, :first, :all and :scan_all to get your result
-      #    This provides an alternative API to the variables hash. See Flex::Persistence::Scoped
+      #    See Flex::Persistence::Scoped
       #
       #    scoped = MyModel.terms(:field_one => 'something', :field_two => nil)
       #                    .sort(:field_three => :desc)
@@ -47,6 +47,20 @@ module Flex
         Scoped.new(self)
       end
 
+      #    define scopes as class methods
+      #
+      #  class MyModel
+      #    include Flex::StoredModel
+      #    ...
+      #    scope :red, terms(:color => 'red').sort(:supplier => :asc)
+      #    scope :size do |size|
+      #      terms(:size => size)
+      #    end
+      #
+      #    MyModel.size('large').first
+      #    MyModel.red.all
+      #    MyModel.size('small').red.all
+      #
       def scope(name, scoped=nil, &block)
         proc = case
                when block_given?
