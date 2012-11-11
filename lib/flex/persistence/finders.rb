@@ -42,10 +42,12 @@ module Flex
       #
       delegate :terms, :params, :filters, :sort, :fields, :count, :first, :all, :scan_all, :to => :scoped
 
+
       # You can start with a non restricted Flex::Persistence::Scoped object
       def scoped
         Scoped.new(self)
       end
+
 
       #    define scopes as class methods
       #
@@ -79,7 +81,7 @@ module Flex
                 unless scoped.is_a?(Scoped)
           scoped
         end
-        scopes << name
+        @scopes << name
       end
 
     end

@@ -24,8 +24,10 @@ module Flex
         deep_merge :filters => array_value(value)
       end
 
-      # accepts one or an array or a list of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
-      # doesn't probably support the multiple hash form, but you can pass an hash as single argument or an array or list of hashes
+      # accepts one or an array or a list of sort structures documented at
+      # http://www.elasticsearch.org/guide/reference/api/search/sort.html
+      # doesn't probably support the multiple hash form, but you can pass an hash as single argument
+      # or an array or list of hashes
       def sort(*value)
         deep_merge :sort => array_value(value)
       end

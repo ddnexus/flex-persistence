@@ -6,15 +6,13 @@ module Flex
 
     def self.included(base)
       base.class_eval do
-        @flex ||= ClassProxy::StoredModel.new(base)
+        @flex ||= ClassProxy::StoredModel.new(base, :params => {:version => true})
         def self.flex; @flex end
-        extend Persistence::FlexResult
-        @flex.variables.deep_merge!(:params => {:version => true})
 
         @scopes = []
         def self.scopes; @scopes end
-        def self.scopes=val; @scopes = val end
 
+        extend Persistence::FlexResult
         include ActiveAttr::Model
 
         extend ActiveModel::Callbacks
