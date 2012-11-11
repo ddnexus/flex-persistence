@@ -70,6 +70,11 @@ module Flex
           self.freeze
         end
 
+        def update_attributes(attributes)
+          attributes.each {|name, value| send "#{name}=", value }
+          save
+        end
+
         def destroyed?
           !!@destroyed
         end

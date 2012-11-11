@@ -40,10 +40,5 @@ module Flex
       true
     end
 
-    def update_attributes(attributes)
-      attributes.each {|name, value| send "#{name}=", value }
-      save
-    end
-
   end
 end
