@@ -67,6 +67,27 @@ module Flex
         end
       end
 
+      def scope(name, scoped=nil, &block)
+        proc = case
+               when block_given?
+                 block
+               when scoped.is_a?(Scoped)
+                 lambda {scoped}
+               when scoped.is_a?(Proc)
+                 scoped
+               else
+                 raise ArgumentError, "Scoped object or Proc expected (got #{scoped.inspect})"
+               end
+        metaclass = class << self; self end
+        metaclass.send(:define_method, name) do |*args|
+          scoped = proc.call(*args)
+          raise Scope::Error, "The scope :#{name} does not return a Flex::Persistence::Scope" \
+                unless scoped.is_a?(Scoped)
+          scoped
+        end
+        scopes << name
+      end
+
     end
   end
 end

@@ -2,6 +2,8 @@ module Flex
   module Persistence
     class Scoped < Hash
 
+      class Error < StandardError; end
+
       include Structure::Mergeable
 
       # never instantiate this object directly: it is automatically done by the StoredModel.scoped method
@@ -12,37 +14,34 @@ module Flex
 
       # accepts also :any_term => nil for missing values
       def terms(value)
-        deep_merge! self.class.process_terms(value)
-        self
+        deep_merge self.class.process_terms(value)
       end
 
       # the standard :params variable
       def params(value)
-        deep_merge! :params => value
-        self
+        deep_merge :params => value
       end
 
       # accepts one or an array or a list of filter structures
       def filters(*value)
-        process_array :filters, value
-        self
+        value = value.first if value.first.is_a?(Array) && value.size == 1
+        deep_merge :filters => value
       end
 
       # accepts one or an array or a list of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
       # doesn't support the multiple hash form, but you can pass an hash as single argument or an array of hashes
       def sort(*value)
-        process_array :sort, value
-        self
+        value = value.first if value.first.is_a?(Array) && value.size == 1
+        deep_merge :sort => value
       end
 
       # the fields that you want to retrieve (limiting the size of the response)
       # the returned records will be frozen, and the missing fileds will be nil
-      # pass a comma separated (no space) string e.g. fields('field_one,field_two')
-      # or an array eg fields.([:field_one, :field_two])
+      # pass an array eg fields.([:field_one, :field_two])
       # or a list of fields e.g. fields(:field_one, :field_two)
       def fields(*value)
-        params :fields => value
-        self # just for simmetry
+        value = value.first if value.first.is_a?(Array) && value.size == 1
+        deep_merge :params => {:fields => value}
       end
 
       # it limits the size of the query to 1 and returns it as a single document object
@@ -76,6 +75,15 @@ module Flex
         "#<#{self.class.name} #{self}>"
       end
 
+      def respond_to?(meth, private=false)
+        super || @model_class.scopes.include?(meth.to_sym)
+      end
+
+      def method_missing(meth, *args, &block)
+        super unless respond_to?(meth)
+        deep_merge @model_class.send(meth, *args)
+      end
+
     private
 
       def self.process_terms(hash)
@@ -83,12 +91,6 @@ module Flex
         missing_fields = []
         hash.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (clean_terms[f] = v) }
         {:terms => clean_terms, :_missing_fields => missing_fields}
-      end
-
-      def process_array(name, value)
-        self[name] ||= []
-        value = value.first if value.first.is_a?(Array) && value.size == 1
-        self[name] += value
       end
 
     end

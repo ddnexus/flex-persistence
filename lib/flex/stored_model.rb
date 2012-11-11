@@ -11,6 +11,10 @@ module Flex
         extend Persistence::FlexResult
         @flex.variables.deep_merge!(:params => {:version => true})
 
+        @scopes = []
+        def self.scopes; @scopes end
+        def self.scopes=val; @scopes = val end
+
         include ActiveAttr::Model
 
         extend ActiveModel::Callbacks
@@ -21,11 +25,6 @@ module Flex
         extend Persistence::Finders
         include Persistence::Inspection
         extend Persistence::Timestamps
-
-        class << self
-          delegate :define_search, :scan_search, :to => :flex
-          alias_method :scope, :define_search
-        end
       end
     end
 
