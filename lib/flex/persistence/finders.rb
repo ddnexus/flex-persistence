@@ -40,31 +40,11 @@ module Flex
       #    scoped2.all
       #    scoped2.scan_all {|batch| do_something_with_results batch}
       #
-      delegate :terms, :params, :filters, :sort, :fields, :to => :scoped
+      delegate :terms, :params, :filters, :sort, :fields, :count, :first, :all, :scan_all, :to => :scoped
 
       # You can start with a non restricted Flex::Persistence::Scoped object
       def scoped
         Scoped.new(self)
-      end
-
-      #    Alternative hash based API
-      #    Instead of chaining scopes (terms, sort, ...) and then call the query method (fist, all, scan_all, count)
-      #    you can directly pass an hash of variables to the query methods
-      #    See Flex::Persistence::Scoped
-      #
-      #    MyModel.count(vars_or_nil)
-      #    MyModel.first(vars_or_nil)
-      #    MyModel.all(vars_or_nil)
-      #    MyModel.scan_all(vars_or_nil){|batch| do_something_with_results batch}
-      #
-      [:count, :first, :all, :scan_all].each do |meth|
-        define_method(meth) do |vars, &block|
-          fields = vars.delete(:fields)
-          (vars[:params] ||= {})[:fields] = fields if fields
-          terms = Scoped.process_terms(vars.delete(:terms)||{})
-          vars  = flex.variables.deep_merge(vars, terms)
-          scoped.replace(vars).send(meth, &block)
-        end
       end
 
       def scope(name, scoped=nil, &block)
@@ -81,7 +61,7 @@ module Flex
         metaclass = class << self; self end
         metaclass.send(:define_method, name) do |*args|
           scoped = proc.call(*args)
-          raise Scope::Error, "The scope :#{name} does not return a Flex::Persistence::Scope" \
+          raise Scoped::Error, "The scope :#{name} does not return a Flex::Persistence::Scope" \
                 unless scoped.is_a?(Scoped)
           scoped
         end
