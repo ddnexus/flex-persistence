@@ -13,8 +13,10 @@ module Flex
       end
 
       # accepts also :any_term => nil for missing values
-      def terms(value)
-        deep_merge self.class.process_terms(value)
+      def terms(hash)
+        terms, missing_fields = {}, []
+        hash.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (terms[f] = v) }
+        deep_merge :terms => terms, :_missing_fields => missing_fields
       end
 
       # the standard :params variable
@@ -24,15 +26,13 @@ module Flex
 
       # accepts one or an array or a list of filter structures
       def filters(*value)
-        value = value.first if value.first.is_a?(Array) && value.size == 1
-        deep_merge :filters => value
+        deep_merge :filters => array_value(value)
       end
 
       # accepts one or an array or a list of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
-      # doesn't support the multiple hash form, but you can pass an hash as single argument or an array of hashes
+      # doesn't probably support the multiple hash form, but you can pass an hash as single argument or an array or list of hashes
       def sort(*value)
-        value = value.first if value.first.is_a?(Array) && value.size == 1
-        deep_merge :sort => value
+        deep_merge :sort => array_value(value)
       end
 
       # the fields that you want to retrieve (limiting the size of the response)
@@ -40,8 +40,7 @@ module Flex
       # pass an array eg fields.([:field_one, :field_two])
       # or a list of fields e.g. fields(:field_one, :field_two)
       def fields(*value)
-        value = value.first if value.first.is_a?(Array) && value.size == 1
-        deep_merge :params => {:fields => value}
+        deep_merge :params => {:fields => array_value(value)}
       end
 
       # it limits the size of the query to 1 and returns it as a single document object
@@ -61,7 +60,8 @@ module Flex
       # You can pass :scroll and :size as params in order to control the action.
       # See http://www.elasticsearch.org/guide/reference/api/search/scroll.html
       def scan_all(&block)
-        result = @model_class.flex.scan_search(Persistence.flex.templates[:find], self, &block)
+        template = Persistence.flex.templates[:find]
+        result   = @model_class.flex.scan_search(template, self, &block)
         @model_class.flex_result(result, self)
       end
 
@@ -86,11 +86,8 @@ module Flex
 
     private
 
-      def self.process_terms(hash)
-        clean_terms    = {}
-        missing_fields = []
-        hash.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (clean_terms[f] = v) }
-        {:terms => clean_terms, :_missing_fields => missing_fields}
+      def array_value(value)
+        value.first if value.first.is_a?(Array) && value.size == 1
       end
 
     end
