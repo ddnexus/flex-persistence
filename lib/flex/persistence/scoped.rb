@@ -55,9 +55,15 @@ module Flex
         deep_merge :params => value
       end
 
-      # it limits the size of the query to 1 and returns it as a single document object
+      # it limits the size of the query to the first document and returns it as a single document object
       def first
         result = Persistence.find params(:size => 1)
+        @model_class.flex_result(result, self).first
+      end
+
+      # it limits the size of the query to the last document and returns it as a single document object
+      def last
+        result = Persistence.find params(:from => count-1, :size => 1)
         @model_class.flex_result(result, self).first
       end
 

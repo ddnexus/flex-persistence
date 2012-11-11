@@ -40,7 +40,7 @@ module Flex
       #    scoped2.all
       #    scoped2.scan_all {|batch| do_something_with_results batch}
       #
-      delegate :terms, :params, :filters, :sort, :fields, :count, :first, :all, :scan_all, :to => :scoped
+      delegate :terms, :params, :filters, :sort, :fields, :count, :first, :last, :all, :scan_all, :to => :scoped
 
 
       # You can start with a non restricted Flex::Persistence::Scoped object
