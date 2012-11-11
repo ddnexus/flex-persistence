@@ -1,6 +1,6 @@
 # Flex-persistence
 
-Flex Plugin: provides ElasticSearch peristence. It includes: ActiveModel validation and callbacks; ActiveAttr typecasting, attribute defaults.
+Flex Plugin: provides ElasticSearch persistence. It includes: ActiveModel validation and callbacks; ActiveAttr typecasting, attribute defaults.
 It implements storage, finders, and optimistic lock update, inline scope templates, etc.
 
 ## Useful Links
