@@ -13,15 +13,10 @@ module Flex
       end
 
       # accepts also :any_term => nil for missing values
-      def terms(hash)
+      def terms(value)
         terms, missing_fields = {}, []
-        hash.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (terms[f] = v) }
+        value.each { |f, v| v.nil? ? missing_fields.push({ :missing => f }) : (terms[f] = v) }
         deep_merge :terms => terms, :_missing_fields => missing_fields
-      end
-
-      # the standard :params variable
-      def params(value)
-        deep_merge :params => value
       end
 
       # accepts one or an array or a list of filter structures
@@ -41,6 +36,21 @@ module Flex
       # or a list of fields e.g. fields(:field_one, :field_two)
       def fields(*value)
         deep_merge :params => {:fields => array_value(value)}
+      end
+
+      # limits the resize of the retrieved hits
+      def size(value)
+        deep_merge :params => {:size => value}
+      end
+
+      # sets the :from param so it will return the nth page of size :size
+      def page(value)
+        deep_merge :params => {:page => value}
+      end
+
+      # the standard :params variable
+      def params(value)
+        deep_merge :params => value
       end
 
       # it limits the size of the query to 1 and returns it as a single document object
