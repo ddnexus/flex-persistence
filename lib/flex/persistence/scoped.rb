@@ -22,24 +22,26 @@ module Flex
         self
       end
 
-      # accepts one or an array of filter structures
-      def filters(value)
+      # accepts one or an array or a list of filter structures
+      def filters(*value)
         process_array :filters, value
         self
       end
 
-      # accepts one or an array of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
+      # accepts one or an array or a list of sort structures documented in http://www.elasticsearch.org/guide/reference/api/search/sort.html
       # doesn't support the multiple hash form, but you can pass an hash as single argument or an array of hashes
-      def sort(value)
+      def sort(*value)
         process_array :sort, value
         self
       end
 
       # the fields that you want to retrieve (limiting the size of the response)
       # the returned records will be frozen, and the missing fileds will be nil
-      # pass a comma separated (no space) string e.g. 'field_one,field_two'
-      def fields(value)
-        params(:fields => value)
+      # pass a comma separated (no space) string e.g. fields('field_one,field_two')
+      # or an array eg fields.([:field_one, :field_two])
+      # or a list of fields e.g. fields(:field_one, :field_two)
+      def fields(*value)
+        params :fields => value
         self # just for simmetry
       end
 
@@ -64,6 +66,7 @@ module Flex
         @model_class.flex_result(result, self)
       end
 
+      # performs a count search on the scope
       def count
         result = Persistence.flex.count_search(:find, self)
         result['hits']['total']
@@ -84,11 +87,8 @@ module Flex
 
       def process_array(name, value)
         self[name] ||= []
-        if value.is_a?(Array)
-          self[name] += value
-        else
-          self[name] << value
-        end
+        value = value.first if value.first.is_a?(Array) && value.size == 1
+        self[name] += value
       end
 
     end

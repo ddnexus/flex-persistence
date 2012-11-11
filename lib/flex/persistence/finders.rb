@@ -29,7 +29,7 @@ module Flex
       #    scoped = MyModel.terms(:field_one => 'something', :field_two => nil)
       #                    .sort(:field_three => :desc)
       #                    .filters(:range => {:created_at => {:from => 2.days.ago, :to => Time.now})
-      #                    .fields('field_one,field_two,field_three')
+      #                    .fields('field_one,field_two,field_three') # or [:field_one, :field_two, ...]
       #                    .params(:any => 'param')
       #
       #    # add another filter or other terms at any time
@@ -59,6 +59,8 @@ module Flex
       #
       [:count, :first, :all, :scan_all].each do |meth|
         define_method(meth) do |vars, &block|
+          fields = vars.delete(:fields)
+          (vars[:params] ||= {})[:fields] = fields if fields
           terms = Scoped.process_terms(vars.delete(:terms)||{})
           vars  = flex.variables.deep_merge(vars, terms)
           scoped.replace(vars).send(meth, &block)
