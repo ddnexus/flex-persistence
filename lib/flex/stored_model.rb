@@ -9,9 +9,6 @@ module Flex
         @flex ||= ClassProxy::StoredModel.new(base, :params => {:version => true})
         def self.flex; @flex end
 
-        @scopes = []
-        def self.scopes; @scopes end
-
         extend Persistence::FlexResult
         include ActiveAttr::Model
 
@@ -20,9 +17,10 @@ module Flex
 
         include Persistence::Storage::InstanceMethods
         extend Persistence::Storage::ClassMethods
-        extend Persistence::Finders
         include Persistence::Inspection
         extend Persistence::Timestamps
+
+        include Model::Finders
       end
     end
 

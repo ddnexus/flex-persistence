@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
 Flex Plugin: provides ElasticSearch peristence. It includes: ActiveModel validation and callbacks; ActiveAttr typecasting, attribute defaults.
 It implements storage, with optional optimistic lock update, finders, inline scope for easy query definition, etc.
   description
-  s.homepage                  = 'http://github.com/ddnexus/flex-rails'
+  s.homepage                  = 'http://github.com/ddnexus/flex-persistence'
   s.authors                   = ["Domizio Demichelis"]
   s.email                     = 'dd.nexus@gmail.com'
   s.extra_rdoc_files          = %w[README.md]
