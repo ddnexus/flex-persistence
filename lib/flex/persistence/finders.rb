@@ -3,8 +3,8 @@ module Flex
     module Finders
 
 
-      #    MyModel.find(ids)
-      #    - ids can ba a single id or an array of ids
+      #    MyModel.find(ids, vars={})
+      #    - ids can be a single id or an array of ids
 
       #    MyModel.find '1Momf4s0QViv-yc7wjaDCA'
       #      #=> #<MyModel ... color: "red", size: "small">
@@ -14,9 +14,9 @@ module Flex
 
       def find(ids, vars={})
         result = if ids.is_a?(Array)
-                   Flex.multi_get(process_vars(:ids => ids).deep_merge(vars))
+                   Flex.multi_get flex.variables.deep_merge({:ids => ids}, vars)
                  else
-                   Flex.get(process_vars(:id => ids).deep_merge(vars))
+                   Flex.get flex.variables.deep_merge({:id => ids}, vars)
                  end
         flex_result(result, vars)
       end
