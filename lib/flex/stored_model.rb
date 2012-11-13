@@ -20,7 +20,7 @@ module Flex
         include Persistence::Inspection
         extend Persistence::Timestamps
 
-        include Model::Finders
+        include Finders::Inline
       end
     end
 
