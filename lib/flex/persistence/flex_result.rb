@@ -3,6 +3,7 @@ module Flex
     module FlexResult
 
       def flex_result(result, vars)
+        return result if vars[:raw_result]
         freeze = vars[:params] && !!vars[:params][:fields]
         case result
         when Flex::Result::SourceDocument
