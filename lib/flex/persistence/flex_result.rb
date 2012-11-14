@@ -6,7 +6,7 @@ module Flex
         return result if vars[:raw_result]
         freeze = vars[:params] && !!vars[:params][:fields]
         case result
-        when Flex::Result::SourceDocument
+        when Flex::Result::Document
           build_object result, freeze
         when Flex::Result::Search
           result['hits']['hits'].map {|d| build_object(d, freeze)}
