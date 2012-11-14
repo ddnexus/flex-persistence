@@ -4,10 +4,10 @@ module Flex
 
       module ClassMethods
 
-        def create(args={})
+        def create(args={}, vars={})
           document = new(args)
           return false unless document.valid?
-          document.save
+          document.save(vars)
         end
 
       end
