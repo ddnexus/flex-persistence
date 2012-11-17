@@ -15,6 +15,10 @@ module Flex
         extend ActiveModel::Callbacks
         define_model_callbacks :create, :update, :save, :destroy
 
+        refresh = proc{ Flex.refresh_index :index => self.class.flex.index }
+        after_save &refresh
+        after_destroy &refresh
+
         include Persistence::Storage::InstanceMethods
         extend Persistence::Storage::ClassMethods
         include Persistence::Inspection
