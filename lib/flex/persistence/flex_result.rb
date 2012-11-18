@@ -9,9 +9,11 @@ module Flex
         when Flex::Result::Document
           build_object result, freeze
         when Flex::Result::Search
-          result['hits']['hits'].map {|d| build_object(d, freeze)}
+          res = result['hits']['hits'].map {|d| build_object(d, freeze)}
+          collection_extend res, result['hits']['total'], vars
         when Flex::Result::MultiGet
-          result['docs'].map {|d| build_object(d, freeze)}
+          res = result['docs'].map {|d| build_object(d, freeze)}
+          collection_extend res, res.size, vars
         else
           result
         end
@@ -28,6 +30,11 @@ module Flex
         freeze ? object.freeze : object
       end
 
+      def collection_extend(result, total, vars)
+        result.extend Result::Collection
+        result.setup total, vars
+        result
+      end
     end
   end
 end
