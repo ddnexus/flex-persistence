@@ -2,7 +2,8 @@ module Flex
   module Persistence
     module FlexResult
 
-      def flex_result(result, vars)
+      def flex_result(result)
+        vars = result.variables
         return result if vars[:raw_result]
         freeze = vars[:params] && !!vars[:params][:fields]
         case result
