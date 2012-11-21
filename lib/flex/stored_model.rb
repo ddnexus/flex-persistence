@@ -6,7 +6,9 @@ module Flex
 
     def self.included(base)
       base.class_eval do
-        @flex ||= ClassProxy::StoredModel.new(base, :params => {:version => true})
+        @flex ||= ClassProxy::Base.new(base)
+        @flex.extend(ClassProxy::Model).init
+        @flex.extend(ClassProxy::StoredModel).init :params => {:version => true}
         def self.flex; @flex end
 
         extend Persistence::FlexResult

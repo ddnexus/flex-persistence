@@ -1,6 +1,10 @@
 module Flex
   module ClassProxy
-    class StoredModel < Model
+    module StoredModel
+
+      def init(vars={})
+        variables.deep_merge! vars
+      end
 
       def sync(*synced)
         raise ArgumentError, 'You cannot flex.sync(self) a Flex::StoredModel.' \
