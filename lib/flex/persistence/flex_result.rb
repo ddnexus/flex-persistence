@@ -4,7 +4,6 @@ module Flex
 
       def flex_result(result)
         vars = result.variables
-        return result if vars[:raw_result]
         freeze = vars[:params] && !!vars[:params][:fields]
         case result
         when Flex::Result::Document
