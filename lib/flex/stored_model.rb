@@ -11,10 +11,10 @@ module Flex
         @flex.extend(ClassProxy::StoredModel).init :params => {:version => true}
         def self.flex; @flex end
 
-        extend Persistence::FlexResult
+        extend  Persistence::FlexResult
         include ActiveAttr::Model
 
-        extend ActiveModel::Callbacks
+        extend  ActiveModel::Callbacks
         define_model_callbacks :create, :update, :save, :destroy
 
         refresh = proc{ Flex.refresh_index :index => self.class.flex.index }
@@ -22,11 +22,11 @@ module Flex
         after_destroy &refresh
 
         include Persistence::Storage::InstanceMethods
-        extend Persistence::Storage::ClassMethods
+        extend  Persistence::Storage::ClassMethods
         include Persistence::Inspection
-        extend Persistence::Timestamps
+        extend  Persistence::Timestamps
 
-        include Finders::Inline
+        include Finders
       end
     end
 
