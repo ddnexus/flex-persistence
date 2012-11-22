@@ -25,8 +25,6 @@ module Flex
         extend  Persistence::Storage::ClassMethods
         include Persistence::Inspection
         extend  Persistence::Timestamps
-
-        include Finders
       end
     end
 
