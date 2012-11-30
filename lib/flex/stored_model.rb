@@ -33,7 +33,7 @@ module Flex
     end
 
     def flex_source
-      attributes.to_json
+      attributes
     end
 
     def flex_indexable?
