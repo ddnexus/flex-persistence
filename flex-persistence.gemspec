@@ -18,6 +18,5 @@ It implements storage, with optional optimistic lock update, finders, inline sco
   s.rdoc_options              = %w[--charset=UTF-8]
 
   s.add_runtime_dependency 'flex', '~> 0.5.0'
-  s.add_runtime_dependency 'flex-find', '~> 0.1.0'
   s.add_runtime_dependency 'active_attr', '~> 0.6.0'
 end
