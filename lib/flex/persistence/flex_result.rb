@@ -3,8 +3,8 @@ module Flex
     module FlexResult
 
       def flex_result(result)
-        vars = result.variables
-        freeze = vars[:params] && !!vars[:params][:fields]
+        vars   = result.variables
+        freeze = !!vars[:params][:fields]
         case result
         when Flex::Result::Document
           build_object result, freeze
@@ -21,13 +21,14 @@ module Flex
 
     private
 
-      def build_object(result, freeze)
-        object = new(freeze ? result['fields'] : result['_source'])
+      def build_object(doc, freeze)
+        attrs  = (doc['_source']||{}).merge(doc['fields']||{})
+        object = new attrs
         object.instance_eval do
-          @_id      = result['_id']
-          @_version = result['_version']
+          @_id      = doc['_id']
+          @_version = doc['_version']
         end
-        freeze ? object.freeze : object
+        (freeze || doc['fields']) ? object.freeze : object
       end
 
       def collection_extend(result, total, vars)
