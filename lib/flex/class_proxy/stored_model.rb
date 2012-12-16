@@ -28,7 +28,7 @@ module Flex
                           next
                         end
         end
-        {index => { 'mappings' => { type => { 'properties' => props } } } } unless props.empty?
+        { index => { 'mappings' => { type => { 'properties' => props } } } } unless props.empty?
       end
 
     end
