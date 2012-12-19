@@ -12,7 +12,6 @@ module Flex
         def self.flex; @flex end
 
         include Scopes
-        extend  Persistence::FlexResult
         include ActiveAttr::Model
 
         extend  ActiveModel::Callbacks
