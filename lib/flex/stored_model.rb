@@ -11,6 +11,7 @@ module Flex
         @flex.extend(ClassProxy::StoredModel).init :params => {:version => true}
         def self.flex; @flex end
 
+        include Scopes
         extend  Persistence::FlexResult
         include ActiveAttr::Model
 

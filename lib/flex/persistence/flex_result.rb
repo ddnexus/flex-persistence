@@ -5,17 +5,14 @@ module Flex
       def flex_result(result)
         vars   = result.variables
         freeze = !!vars[:params][:fields]
-        case result
-        when Flex::Result::Document
-          build_object result, freeze
-        when Flex::Result::Search
-          res = result['hits']['hits'].map {|d| build_object(d, freeze)}
-          collection_extend res, result['hits']['total'], vars
-        when Flex::Result::MultiGet
-          res = result['docs'].map {|d| build_object(d, freeze)}
-          collection_extend res, res.size, vars
+        result = super
+        if result.is_a?(Array)
+          res = result.map {|d| build_object(d, freeze)}
+          res.extend Result::Collection
+          res.setup result.size, vars
+          res
         else
-          result
+          build_object result, freeze
         end
       end
 
@@ -31,11 +28,6 @@ module Flex
         (freeze || doc['fields']) ? object.freeze : object
       end
 
-      def collection_extend(result, total, vars)
-        result.extend Result::Collection
-        result.setup total, vars
-        result
-      end
     end
   end
 end
