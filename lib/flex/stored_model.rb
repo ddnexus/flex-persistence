@@ -9,6 +9,8 @@ module Flex
         @flex ||= ClassProxy::Base.new(base)
         @flex.extend(ClassProxy::Model).init
         @flex.extend(ClassProxy::StoredModel).init :params => {:version => true}
+        @flex.extend(ClassProxy::LoaderOverride) if @flex.is_a?(Flex::ClassProxy::Loader)
+
         def self.flex; @flex end
 
         include Scopes
