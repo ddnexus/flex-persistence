@@ -13,5 +13,5 @@ Special thanks for their sponsorship to [Escalate Media](http://www.escalatemedi
 
 ## Copyright
 
-Copyright (c) 2012 by [Domizio Demichelis](mailto://dd.nexus@gmail.com)<br>
+Copyright (c) 2012-2013 by [Domizio Demichelis](mailto://dd.nexus@gmail.com)<br>
 See [LICENSE](./flex-rails/blob/master/LICENSE) for details.
