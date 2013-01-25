@@ -5,6 +5,7 @@ require 'flex/persistence/storage'
 require 'flex/class_proxy/stored_model'
 require 'flex/instance_proxy/stored_model'
 require 'flex/stored_model'
+require 'flex/refresh_callbacks'
 require 'flex/result/persistence'
 
 Flex::LIB_PATHS << __FILE__.sub(/flex-persistence.rb$/, '')
